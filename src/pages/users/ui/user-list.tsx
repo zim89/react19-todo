@@ -1,20 +1,24 @@
 import type { User } from '@/shared/api'
 import { UserCard } from './user-card'
-import { use } from 'react'
+import type { DeleteUserAction } from '../actions'
 
 export function UsersList({
-  usersPromise,
-  refetchUsers,
+  useUsersList,
+  deleteUserAction,
 }: {
-  usersPromise: Promise<User[]>
-  refetchUsers: () => void
+  useUsersList: () => User[]
+  deleteUserAction: DeleteUserAction
 }) {
-  const users = use(usersPromise)
+  const users = useUsersList()
 
   return (
     <div className='flex flex-col gap-2'>
       {users.map(user => (
-        <UserCard key={user.id} user={user} refetchUsers={refetchUsers} />
+        <UserCard
+          key={user.id}
+          user={user}
+          deleteUserAction={deleteUserAction}
+        />
       ))}
     </div>
   )
