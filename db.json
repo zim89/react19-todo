@@ -1,4 +1,9 @@
 {
   "tasks": [],
-  "users": []
+  "users": [
+    {
+      "id": "e750df9b-1fca-4c24-9be1-5cdd9d2a552a",
+      "email": "sdsv@mail.com"
+    }
+  ]
 }
