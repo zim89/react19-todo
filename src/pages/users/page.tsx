@@ -5,12 +5,12 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { useUsers } from './use-users'
 
 export function UsersPage() {
-  const [usersPromise, refetchUsers] = useUsers()
+  const { useUsersList, createUserAction, deleteUserAction } = useUsers()
 
   return (
     <main className='container mx-auto space-y-6 p-4 pt-10'>
       <h1 className='text-3xl font-bold'>Users</h1>
-      <CreateUserForm refetchUsers={refetchUsers} />
+      <CreateUserForm createUserAction={createUserAction} />
 
       <ErrorBoundary
         fallbackRender={e => (
@@ -20,7 +20,10 @@ export function UsersPage() {
         )}
       >
         <Suspense fallback={<div>Loading users...</div>}>
-          <UsersList usersPromise={usersPromise} refetchUsers={refetchUsers} />
+          <UsersList
+            useUsersList={useUsersList}
+            deleteUserAction={deleteUserAction}
+          />
         </Suspense>
       </ErrorBoundary>
     </main>

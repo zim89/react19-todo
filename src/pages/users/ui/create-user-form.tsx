@@ -1,30 +1,44 @@
-import { useActionState } from 'react'
-import { createUserAction } from '../actions'
+import { useActionState, useOptimistic, useRef } from 'react'
+import { type CreateUserAction } from '../actions'
 
-export function CreateUserForm({ refetchUsers }: { refetchUsers: () => void }) {
-  const [state, dispatch, isPending] = useActionState(
-    createUserAction({ refetchUsers }),
-    { email: '' },
-  )
+export function CreateUserForm({
+  createUserAction,
+}: {
+  createUserAction: CreateUserAction
+}) {
+  const [state, dispatch] = useActionState(createUserAction, {
+    email: '',
+  })
+
+  const [optimisticState, setOptimisticState] = useOptimistic(state)
+  const form = useRef<HTMLFormElement>(null)
 
   return (
-    <form className='flex gap-2' action={dispatch}>
+    <form
+      ref={form}
+      className='flex gap-2'
+      action={(formData: FormData) => {
+        setOptimisticState({ email: '' })
+        dispatch(formData)
+        form.current?.reset()
+      }}
+    >
       <input
-        type='email'
         name='email'
-        defaultValue={state.email}
+        type='email'
+        defaultValue={optimisticState.email}
         className='rounded-md border p-2'
-        disabled={isPending}
       />
       <button
-        disabled={isPending}
         type='submit'
         className='rounded-md bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 disabled:bg-gray-400'
       >
         Add
       </button>
 
-      {state.error && <div className='text-red-500'>{state.error}</div>}
+      {optimisticState.error && (
+        <div className='text-red-500'>{optimisticState.error}</div>
+      )}
     </form>
   )
 }

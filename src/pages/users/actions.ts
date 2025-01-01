@@ -1,19 +1,23 @@
-import { createUser, deleteUser } from '@/shared/api'
+import { createUser, deleteUser, type User } from '@/shared/api'
 
 type CreateActionState = {
   email: string
   error?: string
 }
 
+export type CreateUserAction = (
+  state: CreateActionState,
+  formData: FormData,
+) => Promise<CreateActionState>
+
 export function createUserAction({
   refetchUsers,
+  optimisticCreate,
 }: {
   refetchUsers: () => void
-}) {
-  return async (
-    _: CreateActionState,
-    formData: FormData,
-  ): Promise<CreateActionState> => {
+  optimisticCreate: (user: User) => void
+}): CreateUserAction {
+  return async (_, formData) => {
     const email = formData.get('email') as string
 
     if (email.length === 0) {
@@ -24,7 +28,9 @@ export function createUserAction({
     }
 
     try {
-      await createUser({ email, id: crypto.randomUUID() })
+      const user = { email, id: crypto.randomUUID() }
+      optimisticCreate(user)
+      await createUser(user)
       refetchUsers()
 
       return { email: '' }
@@ -41,15 +47,23 @@ type DeleteActionState = {
   error?: string
 }
 
+export type DeleteUserAction = (
+  state: DeleteActionState,
+  formData: FormData,
+) => Promise<DeleteActionState>
+
 export function deleteUserAction({
-  id,
   refetchUsers,
+  optimisticDelete,
 }: {
-  id: string
   refetchUsers: () => void
-}) {
-  return async (): Promise<DeleteActionState> => {
+  optimisticDelete: (id: string) => void
+}): DeleteUserAction {
+  return async (_, formData) => {
+    const id = formData.get('id') as string
+
     try {
+      optimisticDelete(id)
       await deleteUser(id)
       refetchUsers()
       return {}
