@@ -4,6 +4,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { useParams } from 'react-router-dom'
 import { CreateTaskForm } from './ui/create-task-form'
 import { TasksList } from './ui/tasks-list'
+import { Pagination } from './ui/pagination'
 
 export function TodoListPage() {
   const { userId = '' } = useParams()
@@ -12,8 +13,17 @@ export function TodoListPage() {
     fetchTasks({ filters: { userId } }),
   )
 
-  const refetchTasks = () =>
-    startTransition(() => setTasksPromise(fetchTasks({ filters: { userId } })))
+  const refetchTasks = async () => async () => {
+    const { page } = await paginatedTasksPromise
+
+    startTransition(() =>
+      setTasksPromise(fetchTasks({ filters: { userId }, page })),
+    )
+  }
+
+  const onPageChange = async (newPage: number) => {
+    setTasksPromise(fetchTasks({ filters: { userId }, page: newPage }))
+  }
 
   const tasksPromise = useMemo(
     () => paginatedTasksPromise.then(r => r.data),
@@ -33,6 +43,10 @@ export function TodoListPage() {
       >
         <Suspense fallback={<div>Loading...</div>}>
           <TasksList tasksPromise={tasksPromise} refetchTasks={refetchTasks} />
+          <Pagination
+            tasksPaginated={paginatedTasksPromise}
+            onPageChange={onPageChange}
+          />
         </Suspense>
       </ErrorBoundary>
     </main>
