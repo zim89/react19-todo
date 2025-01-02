@@ -3,7 +3,10 @@ export type User = {
   email: string
 }
 
-export function fetchUsers(): Promise<User[]> {
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+export async function fetchUsers(): Promise<User[]> {
+  await sleep(1000)
   return fetch('http://localhost:4000/users')
     .then(res => res.json())
     .then(data => data as User[])
