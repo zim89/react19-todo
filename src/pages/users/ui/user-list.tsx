@@ -1,4 +1,4 @@
-import type { User } from '@/shared/api'
+import type { User } from '@/shared/user.api'
 import { UserCard } from './user-card'
 import type { DeleteUserAction } from '../actions'
 

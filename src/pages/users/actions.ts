@@ -1,4 +1,4 @@
-import { createUser, deleteUser, type User } from '@/shared/api'
+import { createUser, deleteUser, type User } from '@/shared/user.api'
 
 type CreateActionState = {
   email: string
