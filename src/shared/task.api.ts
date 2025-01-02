@@ -11,9 +11,10 @@ export type PaginatedResponse<T> = {
   first: number
   items: number
   last: number
-  next: string | null
+  next: number | null
+  page: number
   pages: number
-  prev: string | null
+  prev: number | null
 }
 
 export function fetchTasks({
@@ -35,7 +36,9 @@ export function fetchTasks({
     `http://localhost:4000/tasks?_page=${page}&_per_page=${per_page}&_sort=${
       sort.createdAt === 'asc' ? 'createdAt' : '-createdAt'
     }&userId=${filters?.userId}`,
-  ).then(res => res.json() as Promise<PaginatedResponse<Task>>)
+  )
+    .then(res => res.json() as Promise<PaginatedResponse<Task>>)
+    .then(r => ({ ...r, page }))
 }
 
 export function createTask(task: Omit<Task, 'id' | 'createdAt'>) {
